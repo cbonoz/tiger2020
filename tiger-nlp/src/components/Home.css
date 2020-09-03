@@ -1,0 +1,52 @@
+.main-area {
+  padding: 20px;
+}
+
+.header-text {
+  font-size: 24px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.navbar-item img {
+  max-height: 4rem;
+}
+
+.subheader {
+  font-weight: bold;
+  font-size: 30px;
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
+.upload-button {
+  margin-bottom: 40px;
+}
+
+.why-section,
+.faq-section {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  margin-bottom: 50px;
+}
+
+.keyword-bubble {
+  background: lightblue;
+  width: 100px;
+  margin: 10px;
+  display: inline-grid;
+  border-radius: 10px;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.center-logo {
+  width: 240px;
+}
+
+.small-logo {
+  width: 140px;
+}
