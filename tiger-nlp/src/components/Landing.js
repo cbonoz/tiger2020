@@ -13,10 +13,7 @@ export default class Landing extends Component {
 
             <p className="subheader">
               Learn and write&nbsp;
-              <a
-                href="https://www.investopedia.com/news/what-erc20-and-what-does-it-mean-ethereum/"
-                target="_blank"
-              >
+              <a href="https://www.tigergraph.com/gsql" target="_blank">
                 GSQL
               </a>
               &nbsp;for Tigergraph
