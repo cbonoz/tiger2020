@@ -13,7 +13,7 @@ export default class Header extends Component {
         >
           <div className="navbar-brand">
             <a className="navbar-item" href="/">
-              <img src={logo} width="112" height="28" />
+              <img src={logo} width="60" height="28" />
             </a>
 
             <a
