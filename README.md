@@ -4,12 +4,13 @@
 
 
 # TigerNLP
+Generate GSQL from human sentences.
 
-Built for the Tigergraph Graphathon challenge https://tigergraph2020.devpost.com/
+Currently a prototype. Built for the Tigergraph Graphathon challenge https://tigergraph2020.devpost.com/
 
 Tigergraph GSQL generation based on human input text. Open source, and deployed version available.
 
-Built for improving accessibility and build tools for Tigergraph.
+Built for improving accessibility and build tools for Tigergraph. 
 
 ### Limitations
 
@@ -26,10 +27,11 @@ Note this project currently isn't a complete representation of the GSQL language
 
 An item is considered a property if it is not used in a vertex capacity. i.e. for elements that are defined using 'has a', they would be considered a vertex if we could derive an edge from it but a property otherwise.
 
-
-
 ## Client
-From the `tiger-nlp` directory:
+
+The client is the user-facing website.
+
+From the `tiger-nlp` client directory:
 
 <pre>
     yarn
@@ -37,6 +39,9 @@ From the `tiger-nlp` directory:
 </pre>
 
 ## Server
+
+The backend runs a flask server that serves the model for generating GSQL from english sentences.
+
 From the `./server` directory:
 
 <pre>
@@ -54,7 +59,6 @@ From the `./server` directory:
 <img src="./img/main2.png" width='800'/>
 
 ### Distinguishing vertices from properties.
-
 
 
 ### Dev Notes
