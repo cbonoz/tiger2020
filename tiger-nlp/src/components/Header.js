@@ -32,9 +32,8 @@ export default class Header extends Component {
           <div id="navbarBasicExample" className="navbar-menu">
             <div className="navbar-start">
               <a className="navbar-item" href="/start">
-                Bootstrap a SQL Query
+                Bootstrap a GSQL Query
               </a>
-              {/* <a className="navbar-item">About</a> */}
             </div>
           </div>
         </nav>

@@ -1,15 +1,12 @@
-import React, { Component, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import AceEditor from "react-ace";
-import Collapsible from "react-collapsible";
 
 import "ace-builds/src-noconflict/mode-java";
 import "ace-builds/src-noconflict/theme-github";
-import { getCode, debounce, uploadFile, siaUrl } from "../util/http";
+import { getCode } from "../util/http";
 import { useDebounce } from "use-debounce";
-import logo from "../assets/tiger_nlp_trans.png";
 
 import "./Home.css";
-import Carousel from "./Carousel";
 import KeywordBubble from "./KeywordBubble";
 
 const KEYWORDS = ["named", "called", "has"];
