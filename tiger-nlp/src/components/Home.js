@@ -22,7 +22,7 @@ const SUPPORTED_GSQL = [
 ];
 
 const SAMPLE_TEXT =
-  "I have a graph called Bankworld. A person has an account at a bank. A bank has an name and location.";
+  "I have a graph called Bankworld. A person has an account at a bank. A bank has an name and location. An account has a float balance.";
 
 function Home() {
   const [text, setText] = useState(SAMPLE_TEXT || "");
@@ -56,7 +56,7 @@ function Home() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             className="textarea"
-            placeholder="I want a graph with..."
+            placeholder="I want a graph called..."
             rows="10"
           />
           <h2 className="header-text">Keywords</h2>

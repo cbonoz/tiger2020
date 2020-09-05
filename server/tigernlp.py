@@ -154,7 +154,7 @@ def generate_gsql(text: str):
                     edge = last_dobj.get('name', last_verb)
                     # action = 'is' if last_verb else 'has'
                     verb = edge.upper()
-                    add_edge(verb, [subject['name']], [token.text])
+                    add_edge(verb, [subject['name']], [token.text.capitalize()])
                     reasons.append(
                         f"We reclassified {edge.capitalize()} as an edge since it appeared as a predicate object for another vertex")
 
