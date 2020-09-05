@@ -114,17 +114,17 @@ def generate_gsql(text: str):
         last_subject = None
         subject = {}
         for j, token in enumerate(sentence_doc):
-            word = token.lemma_.lower()
-            if word in STOP_WORDS:
+            word = token.lemma_
+            if word.lower() in STOP_WORDS:
                 continue
 
             obj = None
             token_children = [str(child) for child in token.children]
-            print(word, token.dep_, token.head.text, token.lemma_, token.head.pos_, token_children)
+            print(word, token.dep_, token.head.text, token.head.pos_, token_children)
             raw_word = word
-            word = word.capitalize()
+            word = word.lower().capitalize()
             if token.head.text in GRAPH_NAMING_WORDS and token.dep_ == 'oprd':
-                data['graph_name'] = word
+                data['graph_name'] = raw_word
                 reasons.append('We detected the graph name ' + word)
                 objects = {}
                 # if last_dobj:
@@ -181,14 +181,14 @@ def generate_gsql(text: str):
                         f"Adding {word} as a vertex since it is a direct object")
 
                 # Check for possible edge.
-                if token.head.pos_ == 'VERB':
+                if token.head.pos_ == 'VERB' and last_subject:
                     target = last_subject.capitalize()
                     if target:
                         verb = token.head.text.upper()
                         add_edge(verb, [target], [word])
                         reason = f"""Adding {verb} an edge between {word} and {target}"""
                         reasons.append(reason)
-            elif token.dep_ == 'compound' and PropertyType.has_value(word.lower()):
+            elif token.dep_ in ['compound', 'amod'] and PropertyType.has_value(word.lower()):
                 target = token.head.text
                 type_map[target] = word.lower()
                 print('setting type', target, word)
