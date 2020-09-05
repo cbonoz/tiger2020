@@ -48,7 +48,7 @@ def create_edge(verb, from_list, to_list, is_directed=True, **kwargs):
     directed_str = 'DIRECTED' if is_directed else 'UNDIRECTED'
     from_str = '|'.join(from_list)
     to_str = '|'.join(to_list)
-    return f"CREATE {directed_str} {verb} (FROM {from_str}, TO {to_str}) WITH REVERSE_EDGE=\"{verb}_REVERSE\""
+    return f"CREATE {directed_str} EDGE {verb} (FROM {from_str}, TO {to_str}) WITH REVERSE_EDGE=\"{verb}_REVERSE\""
 
 
 def create_graph(graph_name):
@@ -75,7 +75,11 @@ DROP ALL
     """
 
 
+GRAPH_NAMING_WORDS = set(['named', 'called'])
+
 # https://spacy.io/usage/linguistic-features
+
+
 def generate_gsql(text: str):
     doc = nlp(text)
 
@@ -86,23 +90,40 @@ def generate_gsql(text: str):
     }
     reasons = []
     objects = {}
+
+    def add_edge(verb, from_list, to_list):
+        if verb in objects:
+            from_list.extend(objects[verb]['from_list'])
+            from_list = list(set(from_list))
+            to_list.extend(objects[verb]['to_list'])
+            to_list = list(set(to_list))
+
+        objects[verb] = {
+            'type': ObjectType.EDGE,
+            'verb': verb,
+            'from_list': from_list,
+            'to_list': to_list
+        }
+
     for i, sentence in enumerate(doc.sents):
         sentence_doc = nlp(sentence.string)
         print('\nNext sentence\n')
         type_map = {}
         last_dobj = {}
         last_verb = None
+        last_subject = None
         subject = {}
         for j, token in enumerate(sentence_doc):
             word = token.lemma_.lower()
             if word in STOP_WORDS:
-                word
                 continue
 
             obj = None
-            print(word, token.dep_, token.head.text, token.lemma_,
-                  token.head.pos_, [child for child in token.children])
-            if token.head.text in ['named', 'called'] and token.dep_ == 'oprd':
+            token_children = [str(child) for child in token.children]
+            print(word, token.dep_, token.head.text, token.lemma_, token.head.pos_, token_children)
+            raw_word = word
+            word = raw_word.capitalize()
+            if token.head.text in GRAPH_NAMING_WORDS and token.dep_ == 'oprd':
                 data['graph_name'] = word
                 reasons.append('We detected the graph name ' + word)
                 objects = {}
@@ -116,10 +137,14 @@ def generate_gsql(text: str):
 
                 if token.head.pos_ == 'VERB':
                     last_verb = token.head.text
+                    last_subject = word
+
+                if word == '-pron-':
+                    continue
 
                 subject = obj
                 reasons.append(
-                    f"Adding {word.capitalize()} as a vertex since it appeared as a sentence subject")
+                    f"Adding {word} as a vertex since it appeared as a sentence subject")
             elif token.dep_ == 'pobj':
                 obj = {
                     'type': ObjectType.VERTEX,
@@ -127,36 +152,46 @@ def generate_gsql(text: str):
                 }
                 if 'name' in last_dobj or last_verb:
                     edge = last_dobj.get('name', last_verb)
-                    action = 'is' if last_verb else 'has'
-                    verb = f"{action}_{edge}".upper()
-                    objects[verb] = {
-                        'type': ObjectType.EDGE,
-                        'verb': verb,
-                        'from_list': [subject['name']],
-                        'to_list': [token.text]
-                    }
+                    # action = 'is' if last_verb else 'has'
+                    verb = edge.upper()
+                    add_edge(verb, [subject['name']], [token.text])
                     reasons.append(
                         f"We reclassified {edge.capitalize()} as an edge since it appeared as a predicate object for another vertex")
 
                     if subject:
                         objects[subject['name']].pop(f"~{edge}", None)
-            elif token.dep_ == 'dobj':
+            elif token.dep_ == 'dobj' or token.dep_ == 'prep':
+                is_naming = set(token_children).intersection(
+                    GRAPH_NAMING_WORDS)
+                # print('is_naming', is_naming, token_children, GRAPH_NAMING_WORDS)
+                if is_naming and not data['graph_name']:
+                    # Skip if we don't have a graph name yet and this is a name clause
+                    continue
                 last_dobj = {
                     'type': ObjectType.VERTEX,
                     'name': word
                 }
+                print('dobj', token.head.pos_, token.lemma_, objects)
                 if token.head.text == 'has' and subject.get('name') in objects:
                     subject_name = subject.get('name')
                     objects[subject_name][f"~{word}"] = PropertyType.STRING
-                else:
+                elif token.dep_ == 'dobj':
                     obj = last_dobj
                     reasons.append(
-                        f"Adding {word.capitalize()} as a vertex since it is a direct object")
+                        f"Adding {word} as a vertex since it is a direct object")
+
+                # Check for possible edge.
+                if token.head.pos_ == 'VERB':
+                    target = last_subject.capitalize()
+                    if target:
+                        verb = token.head.text.capitalize()
+                        add_edge(verb, [target], [word])
+                        reason = f"""Adding {verb} an edge between {word} and {target}"""
+                        reasons.append(reason)
             elif token.dep_ == 'compound' and PropertyType.has_value(word):
-                type_map[token.head.text] = word
+                type_map[token.head.text.lower()] = word
             elif token.dep_ == 'conj' and subject.get('name') in objects:
-                objects[subject['name']][f"~{word}"] = type_map.get(
-                    word, PropertyType.STRING)
+                objects[subject['name']][f"~{raw_word}"] = type_map.get(raw_word.lower(), PropertyType.STRING)
 
             if obj and obj['name'] not in objects:
                 objects[obj['name']] = obj

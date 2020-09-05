@@ -9,7 +9,9 @@ import { useDebounce } from "use-debounce";
 import "./Home.css";
 import KeywordBubble from "./KeywordBubble";
 
-const KEYWORDS = ["named", "called", "has"];
+const KEYWORDS = ["graph", "named", "called", "has"];
+
+const TYPES = ["float", "string", "bool", "datetime", "int", "double"];
 const SUPPORTED_GSQL = [
   "Vertices",
   "Directed edges",
@@ -20,13 +22,10 @@ const SUPPORTED_GSQL = [
 ];
 
 const SAMPLE_TEXT =
-  "I have a project called BankWorld. A person has an account at a bank. A bank has an name and location.";
+  "I have a graph called Bankworld. A person has an account at a bank. A bank has an name and location.";
 
 function Home() {
   const [text, setText] = useState(SAMPLE_TEXT || "");
-  const [codeGraph, setCodeGraph] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [lastUpload, setLastUpload] = useState("");
 
   const [debounceText] = useDebounce(text, 1000);
   const [result, setResult] = useState("");
@@ -68,6 +67,14 @@ function Home() {
               onClick={(w) => setText(text + " " + w)}
             />
           ))}
+          <h2 className="header-text">Types</h2>
+          {TYPES.map((word, i) => (
+            <KeywordBubble
+              key={i}
+              word={word}
+              onClick={(w) => setText(text + " " + w)}
+            />
+          ))}
         </div>
         <div className="column is-half">
           <div className="header-text">See the GSQL on the right...</div>
@@ -84,12 +91,13 @@ function Home() {
         </div>
       </div>
       {/* <div className="breakdown-section">{JSON.stringify(codeGraph)}</div> */}
-      <h3>Limitations</h3>
+      <h2 className="header-text">Limitations</h2>
       <div className="upload-section">
         <p>
-          Sentences are expected to have one subject and possible multiple
-          direct objects or actions Only supports the following constructs:
+          Use simple sentences. Sentences are expected to have one subject and
+          possible multiple direct objects or actions.
         </p>
+        <p>Supports the following constructs:</p>
         {SUPPORTED_GSQL.map((v, i) => {
           return <li key={i}>{v}</li>;
         })}
