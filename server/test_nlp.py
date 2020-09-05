@@ -5,17 +5,7 @@ from tigernlp import generate_gsql
 EXAMPLE_1 = "I have a graph called Bankworld. A person has an account at a bank. A bank has an name and location. A person has a string name and datetime birthday."
 
 EXAMPLE_2 = f"""
-Person is a person who participates in a forum.
-A person has a birthday datetime and a name.
-Forum is a place where persons discuss topics.
-Company and University are organizations with which a person can be affiliated.
-Comment and Post are the interaction messages created by a person in a forum.
-A comments lives in a forum
-A person studies at a university.
-A person works at a company.
-Tag is a topic or a concept.
-TagClass is a class or a category. 
-TagClass are a hierarchy of tags.
+I want a graph called RemoteUniversity. Person is a person who participates in a forum.  A topic has a string url. Forum is a place where persons discuss topics. A comment lives in a forum. A person studies at a university. A university also has a string location. A person has a datetime birthday. A person takes exams. An exam has a subject and an int score.
 """
 
 EXAMPLE_3 = f"""
