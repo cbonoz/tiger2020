@@ -122,7 +122,7 @@ def generate_gsql(text: str):
             token_children = [str(child) for child in token.children]
             print(word, token.dep_, token.head.text, token.lemma_, token.head.pos_, token_children)
             raw_word = word
-            word = raw_word.capitalize()
+            word = word.capitalize()
             if token.head.text in GRAPH_NAMING_WORDS and token.dep_ == 'oprd':
                 data['graph_name'] = word
                 reasons.append('We detected the graph name ' + word)
@@ -174,7 +174,7 @@ def generate_gsql(text: str):
                 print('dobj', token.head.pos_, token.lemma_, objects)
                 if token.head.text == 'has' and subject.get('name') in objects:
                     subject_name = subject.get('name')
-                    objects[subject_name][f"~{word}"] = PropertyType.STRING
+                    objects[subject_name][f"~{raw_word}"] = type_map.get(raw_word, PropertyType.STRING)
                 elif token.dep_ == 'dobj':
                     obj = last_dobj
                     reasons.append(
@@ -184,14 +184,17 @@ def generate_gsql(text: str):
                 if token.head.pos_ == 'VERB':
                     target = last_subject.capitalize()
                     if target:
-                        verb = token.head.text.capitalize()
+                        verb = token.head.text.upper()
                         add_edge(verb, [target], [word])
                         reason = f"""Adding {verb} an edge between {word} and {target}"""
                         reasons.append(reason)
-            elif token.dep_ == 'compound' and PropertyType.has_value(word):
-                type_map[token.head.text.lower()] = word
+            elif token.dep_ == 'compound' and PropertyType.has_value(word.lower()):
+                target = token.head.text
+                type_map[target] = word.lower()
+                print('setting type', target, word)
             elif token.dep_ == 'conj' and subject.get('name') in objects:
-                objects[subject['name']][f"~{raw_word}"] = type_map.get(raw_word.lower(), PropertyType.STRING)
+                print('adding type', raw_word, type_map)
+                objects[subject['name']][f"~{raw_word}"] = type_map.get(raw_word, PropertyType.STRING)
 
             if obj and obj['name'] not in objects:
                 objects[obj['name']] = obj
@@ -213,7 +216,7 @@ def generate_gsql(text: str):
     else:
         code = 'Keep typing...'
 
-    return code, reasons
+    return code, list(set(reasons))
 
 
 if __name__ == '__main__':
